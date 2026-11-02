@@ -4,7 +4,12 @@ Risk-based Chromium coverage for the [Cypress Kitchen Sink ToDo application](htt
 
 Application source pinned in Docker: `dca70562c010156b05cc8b54e641f67c0063d5dc`. Tests cover the implementation at that commit, including its initial sample tasks.
 
-**Status:** see [validation and PDF audit](docs/ASSESSMENT_AUDIT.md). Local execution is verified. Docker execution and GitHub publication require the remaining environment/setup steps. One confirmed product bug is deliberately represented by an expected-failure regression; a green suite does not mean the product is defect-free.
+**Status:** local execution and GitHub-hosted Docker test execution have passed. Allure is published on GitHub Pages, with history/trends confirmed across three CI runs. QA-001 is published as a GitHub issue. See the [validation and PDF audit](docs/ASSESSMENT_AUDIT.md) for evidence and remaining limits: local Docker Desktop execution and a controlled failing hosted CI run remain unverified. One confirmed product bug is deliberately represented by an expected-failure regression; a green suite does not mean the product is defect-free.
+
+- [GitHub repository](https://github.com/andjeloed/todo-playwright-automation)
+- [Published Allure report](https://andjeloed.github.io/todo-playwright-automation/)
+- [QA-001: published product issue](https://github.com/andjeloed/todo-playwright-automation/issues/1)
+- [GitHub Actions runs](https://github.com/andjeloed/todo-playwright-automation/actions)
 
 See the [independent implementation review](docs/CODE_REVIEW.md) for confirmed issues fixed, revalidation, unresolved gaps and five technical decisions to defend in an interview.
 
@@ -20,7 +25,7 @@ tests/todo-filters.spec.ts         Mixed states and live filtering
 tests/todo-persistence.spec.ts     CRUD/status/filter persistence
 tests/todo-known-defect.spec.ts    QA-001 expected-failure regression
 scripts/                          Container execution, result cleanup, reports
-docs/issues/QA-001.md              Unpublished GitHub issue draft
+docs/issues/QA-001.md              Local record of published GitHub issue #1
 docs/evidence/QA-001.png           Verified product finding
 docs/ASSESSMENT_AUDIT.md           Actual validation and requirement audit
 Dockerfile / .dockerignore         Independent application retrieval
@@ -146,7 +151,7 @@ docker run --rm --init -it todo-assessment bash
 docker run --rm --init --ipc=host todo-assessment sh scripts/container-test.sh --grep 'P0 deletes'
 ```
 
-Inside the interactive shell: `npm run typecheck`, `npm start --prefix /opt/kitchensink`, or `npx playwright test` (with the appropriate `START_APP` setting). Docker generation and execution remain unverified while the Linux daemon is unavailable.
+Inside the interactive shell: `npm run typecheck`, `npm start --prefix /opt/kitchensink`, or `npx playwright test` (with the appropriate `START_APP` setting). Image build, application startup and tests have succeeded on GitHub-hosted Linux CI. Local Docker Desktop execution remains unverified because its Linux engine could not start. Container cancellation and startup-failure paths have not been exercised.
 
 ## GitHub Actions and reviewer access
 
@@ -154,14 +159,11 @@ The workflow runs on main pushes, pull requests and manual dispatch. It builds a
 
 For trusted main runs, a separate publication job commits the generated report/history to `gh-pages` and deploys the report using official Pages actions. PRs get downloadable artifacts, including fork PRs, and never receive publication permissions. The test job has read-only contents permission; only the main publication job has contents/Pages write and OIDC permissions. No extra secret is required.
 
-Before submission:
+The repository, [issue #1](https://github.com/andjeloed/todo-playwright-automation/issues/1) and [Allure report](https://andjeloed.github.io/todo-playwright-automation/) are published. User-provided screenshots show successful `test` and `publish` jobs and Allure trend entries for runs #1, #2 and #3, each with 15 expected passing outcomes.
 
-1. Create the automation GitHub repository and grant reviewers access. Add its remote and push only when you are ready; nothing has been published by this implementation.
-2. Enable Actions and the maintained official actions used by the workflow. Permit the publication job to write `gh-pages`; branch rules must allow the bot's generated report commits.
-3. Under **Settings → Pages**, choose **GitHub Actions** as the deployment source. Allow the `github-pages` environment to deploy from main; approve any environment protection prompt.
-4. Run the workflow on main. Download `assessment-results`; inspect the report, steps and evidence. The Pages deployment/environment supplies the actual report URL, normally `https://<owner>.github.io/<repository>/`.
-5. Run it again on main. Confirm `gh-pages/history` survives and the second report has two history-trend entries. Repository publication, CI execution and cross-CI history are not locally verified.
-6. Publish [the issue draft](docs/issues/QA-001.md) after reviewing it, upload its screenshot, and record its real URL. Share the repository, issue and Pages links with reviewers.
+Before submission, confirm that the intended reviewers can open all three links; invite them if repository access requires it. A controlled failing hosted CI run remains a follow-up check: verify it concludes failed while still uploading evidence and publishing its report. Failure evidence, nonzero exits and flaky-test rejection have been verified locally.
+
+For a fresh repository, enable Actions, permit generated `gh-pages` commits, select **Settings → Pages → GitHub Actions**, and allow the `github-pages` environment to deploy from main. Run the workflow twice and confirm history is retained. The existing repository has already completed the successful execution/publication/history checks.
 
 All main executions are serialized across testing and publication to avoid history races. GitHub may replace older pending runs during bursts; history reflects executions that actually reach report publication. Failed tests still publish reports. The first run starts without history. Allure retains a rolling history window (normally 20 executions); `gh-pages` commits preserve prior report versions, while full failure evidence expires with artifact retention. Only main contributes to the published trend; PR history is not merged into it. Failed publication requires rerunning the workflow; no false claim of successful deployment is made.
 
@@ -181,7 +183,7 @@ Publication also requires successful history restoration. A restore/authenticati
 
 ## Suggested commits and further work
 
-No commits, remote creation, push or issue publication have been performed. Suggested Conventional Commits, grouped by reviewable changes:
+The user has committed and pushed the implementation and published the issue. These Conventional Commit groupings are examples for future reviewable changes; they do not describe a fabricated commit history:
 
 1. `chore: configure Playwright and strict TypeScript`
 2. `test: cover todo workflows filtering persistence and input edges`
@@ -190,4 +192,4 @@ No commits, remote creation, push or issue publication have been performed. Sugg
 5. `ci: publish Allure reports with persistent history`
 6. `docs: document test approach findings and assessment audit`
 
-With more time: fix and retest QA-001 upstream, add task control accessible names, confirm empty-state requirements, add Firefox/WebKit coverage, pin container/action references by digest/SHA under an update policy, and validate cancellation/startup failure paths in Docker. Complete the pending Docker and two-run CI checks before claiming the assessment is fully verified.
+With more time: fix and retest QA-001 upstream, add task control accessible names, confirm empty-state requirements, add Firefox/WebKit coverage, pin container/action references by digest/SHA under an update policy, and validate cancellation/startup failure paths in Docker. Also exercise a controlled failing hosted CI run; successful hosted execution and three-run history have already been confirmed.

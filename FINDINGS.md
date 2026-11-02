@@ -15,7 +15,7 @@ Verified on 2026-11-02 using Windows, Node 24.13.0, Playwright 1.64.1 Chromium a
 - **Cause:** `app/assets/js/todo/store.js` creates IDs with `new Date().getTime()`; `app.js` synchronously creates two sample tasks. Model/view updates select the first matching ID.
 - **Improvement:** generate collision-resistant IDs and use a consistent ID type throughout model, view and event handlers. Cover same-millisecond additions in product unit tests.
 - **Automation handling:** regression fixes the browser's Date value to reproduce the timing condition reliably, then asserts correct behaviour with `test.fail`. This is an acknowledged expected failure, not a repaired product. An unexpected pass fails the suite and requires investigation/removal of the annotation. Other tests delete samples through the UI and create independent tasks.
-- **Issue:** [ready-to-publish draft](docs/issues/QA-001.md); no issue has been published.
+- **Issue:** published as [GitHub issue #1](https://github.com/andjeloed/todo-playwright-automation/issues/1), with uploaded screenshot evidence confirmed by the user. The [local issue record](docs/issues/QA-001.md) uses the published issue's structure and reproduction details. [Allure report](https://andjeloed.github.io/todo-playwright-automation/).
 
 ## QA-002 — Task controls lack descriptive, task-specific accessible names
 
