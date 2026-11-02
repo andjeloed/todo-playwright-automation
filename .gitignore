@@ -1,0 +1,14 @@
+node_modules/
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+artifacts/
+.tmp/
+.env
+.env.*
+!.env.example
+*.log
+*.zip
+*.webm
+*.code-workspace

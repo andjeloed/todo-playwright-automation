@@ -1,0 +1,112 @@
+name: ToDo assessment
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: todo-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      report-ready: ${{ steps.report.outputs.ready == 'true' && steps.history.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build assessment image
+        id: build
+        run: docker build -t todo-assessment .
+      - name: Run tests and capture exit status
+        id: tests
+        run: |
+          mkdir -p artifacts
+          set +e
+          docker run --rm --init --ipc=host \
+            -v "$PWD/artifacts:/artifacts" todo-assessment 2>&1 | tee artifacts/container.log
+          status=${PIPESTATUS[0]}
+          echo "$status" > artifacts/exit-code.txt
+          echo "exit-code=$status" >> "$GITHUB_OUTPUT"
+      - name: Restore previously published history
+        id: history
+        if: always() && steps.build.outcome == 'success'
+        run: |
+          mkdir -p .tmp/previous-report
+          refs=$(git ls-remote --heads origin gh-pages)
+          if [ -n "$refs" ]; then
+            git fetch --depth=1 origin gh-pages
+            git archive FETCH_HEAD history | tar -x -C .tmp/previous-report
+          else
+            echo 'First publication: no previous history.'
+          fi
+      - name: Generate Allure report
+        id: report
+        if: always() && steps.build.outcome == 'success'
+        run: |
+          docker run --rm --init \
+            -v "$PWD/artifacts:/artifacts" \
+            -v "$PWD/.tmp/previous-report:/work/.tmp/previous-report:ro" \
+            -e GITHUB_RUN_ID -e GITHUB_RUN_NUMBER -e GITHUB_SERVER_URL -e GITHUB_REPOSITORY \
+            todo-assessment node scripts/report.mjs
+          test -f artifacts/allure-report/index.html
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+      - name: Upload results, report and failure evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: assessment-results
+          path: artifacts/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Propagate test failure
+        if: always() && steps.tests.outputs.exit-code != ''
+        env:
+          TEST_EXIT_CODE: ${{ steps.tests.outputs.exit-code }}
+        run: exit "$TEST_EXIT_CODE"
+
+  publish:
+    needs: test
+    if: always() && needs.test.outputs.report-ready == 'true' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: assessment-results
+          path: artifacts
+      - name: Preserve report history in gh-pages
+        run: |
+          refs=$(git ls-remote --heads origin gh-pages)
+          if [ -n "$refs" ]; then
+            git fetch --depth=1 origin gh-pages
+            git worktree add --detach .tmp/published FETCH_HEAD
+          else
+            git worktree add --orphan -b gh-pages .tmp/published
+          fi
+          rsync -a --delete --exclude=.git artifacts/allure-report/ .tmp/published/
+          touch .tmp/published/.nojekyll
+          git -C .tmp/published config user.name 'github-actions[bot]'
+          git -C .tmp/published config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C .tmp/published add .
+          git -C .tmp/published commit --allow-empty -m "docs: publish Allure run $GITHUB_RUN_NUMBER"
+          git -C .tmp/published push origin HEAD:gh-pages
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: artifacts/allure-report
+      - name: Deploy reviewer report
+        id: deployment
+        uses: actions/deploy-pages@v4

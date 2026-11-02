@@ -1,0 +1,10 @@
+node_modules
+.git
+.tmp
+artifacts
+allure-results
+allure-report
+test-results
+playwright-report
+*.code-workspace
+.env*

@@ -1,0 +1,21 @@
+{
+  "name": "todo-playwright-assessment",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "pretest": "node scripts/clean-results.mjs",
+    "test": "playwright test",
+    "test:headed": "npm test -- --headed",
+    "test:debug": "npm test -- --debug",
+    "typecheck": "tsc --noEmit",
+    "report:generate": "node scripts/report.mjs",
+    "report:open": "allure open allure-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "26.6.6",
+    "allure-commandline": "2.46.1",
+    "allure-playwright": "3.14.0",
+    "typescript": "7.0.2"
+  }
+}
