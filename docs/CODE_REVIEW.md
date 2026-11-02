@@ -4,6 +4,8 @@ Reviewed on 2026-11-02 against the entire original two-page assignment PDF, all 
 
 Publication update: the user has pushed the [repository](https://github.com/andjeloed/todo-playwright-automation), published [issue #1](https://github.com/andjeloed/todo-playwright-automation/issues/1) with screenshot evidence, and supplied successful hosted `test`/`publish` screenshots. The [published Allure report](https://andjeloed.github.io/todo-playwright-automation/) shows 15 expected passing outcomes and trends for runs #1, #2 and #3. These later observations close the earlier successful-path Docker/CI/Pages/history gaps. Local Docker execution, controlled hosted failure paths and reviewer-specific access are still unverified.
 
+Final audit update: independent unauthenticated GitHub API/report checks now confirm public repository/issue/report access, successful final-commit run #4 and both artifacts, four stored executions per test, and accessible report diagnostics. Reviewer read access is therefore verified. The latest local rerun passed 15 tests with four workers and no retries in 23.8 s; TypeScript and actionlint passed again. Local Docker and controlled hosted failure paths remain additional checks. See the current [PDF audit](ASSESSMENT_AUDIT.md).
+
 ## Confirmed issues fixed
 
 | Priority | Finding | Correction and validation |
@@ -47,7 +49,7 @@ Temporary probes are under ignored `.tmp/` and excluded from the submission suit
 1. **QA-001 is still a product defect.** The scoped expected-failure test is deliberate technical debt. The report's green status measures the expected automation outcome, not defect-free product acceptance. Its screenshot/state/ID attachments and finding must accompany review. Remove the annotation after a verified product fix; an unexpected pass currently fails execution.
 2. Local Docker Desktop execution and container cancellation/startup-failure handling remain unverified. Successful hosted image construction, startup and suite execution are confirmed; the local daemon limitation no longer blocks the Docker assessment evidence.
 3. A controlled failing hosted workflow has not yet demonstrated that failure evidence/report publication occurs while the workflow concludes failed. Local failure probes and successful hosted publication are verified separately.
-4. Repository, report and issue URLs are published. Intended reviewer access still needs confirmation; sharing the final links and committing the updated validation record remain submission steps.
+4. Repository, report and issue URLs are published and independently confirmed publicly readable. Sharing the final links and committing the final audit update remain delivery steps.
 5. Only Chromium desktop is covered. Comprehensive accessibility, other browsers and multitab behaviour remain documented exclusions. No requirement in the PDF mandates additional browsers.
 
 ## Five interview decisions to defend

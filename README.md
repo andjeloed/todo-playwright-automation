@@ -4,7 +4,7 @@ Risk-based Chromium coverage for the [Cypress Kitchen Sink ToDo application](htt
 
 Application source pinned in Docker: `dca70562c010156b05cc8b54e641f67c0063d5dc`. Tests cover the implementation at that commit, including its initial sample tasks.
 
-**Status:** local execution and GitHub-hosted Docker test execution have passed. Allure is published on GitHub Pages, with history/trends confirmed across three CI runs. QA-001 is published as a GitHub issue. See the [validation and PDF audit](docs/ASSESSMENT_AUDIT.md) for evidence and remaining limits: local Docker Desktop execution and a controlled failing hosted CI run remain unverified. One confirmed product bug is deliberately represented by an expected-failure regression; a green suite does not mean the product is defect-free.
+**Status:** local execution and GitHub-hosted Docker test execution have passed. Allure is published on GitHub Pages, with four stored executions independently verified for each of 15 test histories. QA-001 is published as a GitHub issue. The repository, issue and report are publicly readable. See the [validation and PDF audit](docs/ASSESSMENT_AUDIT.md) for evidence and remaining limits: local Docker Desktop execution and a controlled failing hosted CI run remain unverified. One confirmed product bug is deliberately represented by an expected-failure regression; a green suite does not mean the product is defect-free.
 
 - [GitHub repository](https://github.com/andjeloed/todo-playwright-automation)
 - [Published Allure report](https://andjeloed.github.io/todo-playwright-automation/)
@@ -159,9 +159,9 @@ The workflow runs on main pushes, pull requests and manual dispatch. It builds a
 
 For trusted main runs, a separate publication job commits the generated report/history to `gh-pages` and deploys the report using official Pages actions. PRs get downloadable artifacts, including fork PRs, and never receive publication permissions. The test job has read-only contents permission; only the main publication job has contents/Pages write and OIDC permissions. No extra secret is required.
 
-The repository, [issue #1](https://github.com/andjeloed/todo-playwright-automation/issues/1) and [Allure report](https://andjeloed.github.io/todo-playwright-automation/) are published. User-provided screenshots show successful `test` and `publish` jobs and Allure trend entries for runs #1, #2 and #3, each with 15 expected passing outcomes.
+The repository, [issue #1](https://github.com/andjeloed/todo-playwright-automation/issues/1) and [Allure report](https://andjeloed.github.io/todo-playwright-automation/) are published. Independent public API/report checks confirm successful final-commit [run #4](https://github.com/andjeloed/todo-playwright-automation/actions/runs/41509592502), both report artifacts, 15 expected passing outcomes, and four stored executions per test. Four report-history entries do not imply four successful workflow conclusions: run #2 was cancelled; runs #1, #3 and #4 succeeded.
 
-Before submission, confirm that the intended reviewers can open all three links; invite them if repository access requires it. A controlled failing hosted CI run remains a follow-up check: verify it concludes failed while still uploading evidence and publishing its report. Failure evidence, nonzero exits and flaky-test rejection have been verified locally.
+The three links are publicly readable without authentication; include them in the reviewer submission. A controlled failing hosted CI run remains an additional follow-up check: verify it concludes failed while still uploading evidence and publishing its report. Failure evidence, nonzero exits and flaky-test rejection have been verified locally.
 
 For a fresh repository, enable Actions, permit generated `gh-pages` commits, select **Settings → Pages → GitHub Actions**, and allow the `github-pages` environment to deploy from main. Run the workflow twice and confirm history is retained. The existing repository has already completed the successful execution/publication/history checks.
 
@@ -192,4 +192,4 @@ The user has committed and pushed the implementation and published the issue. Th
 5. `ci: publish Allure reports with persistent history`
 6. `docs: document test approach findings and assessment audit`
 
-With more time: fix and retest QA-001 upstream, add task control accessible names, confirm empty-state requirements, add Firefox/WebKit coverage, pin container/action references by digest/SHA under an update policy, and validate cancellation/startup failure paths in Docker. Also exercise a controlled failing hosted CI run; successful hosted execution and three-run history have already been confirmed.
+With more time: fix and retest QA-001 upstream, add task control accessible names, confirm empty-state requirements, add Firefox/WebKit coverage, pin container/action references by digest/SHA under an update policy, and validate cancellation/startup failure paths in Docker. Also exercise a controlled failing hosted CI run; successful hosted execution and persistent history have already been independently confirmed.
